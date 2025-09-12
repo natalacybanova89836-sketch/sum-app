@@ -8,4 +8,5 @@ func Add(a, b int) int {
 
 func main() {
 	fmt.Println("2 + 3 =", Add(2, 3))
+	fmt.Println(Add(2, 3))
 }
