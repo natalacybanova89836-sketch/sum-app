@@ -1,8 +1,17 @@
+build:
+	go build -o app .
+
 run:
 	go run main.go
 
-test:
-	go test ./...
+fmt:
+	go fmt ./...
 
-build:
-	go build -o app main.go
+lint:
+	golangci-lint run ./...
+
+test:
+	go test -v ./...
+
+vet:
+	go vet ./...

@@ -1,30 +1,26 @@
-name: CI/CD pipeline
+name: Go CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.22
+          go-version: 1.21
 
-      - name: Install dependencies
-        run: go mod tidy
+      - name: Установка зависимостей
+        run: go mod download
 
-      - name: Run tests
-        run: go test ./...
+      - name: Линт
+        run: make lint
 
-      - name: Build
-        run: go build -o app main.go
-
-      - name: Deploy (demo)
-        run: echo "🚀 Build passed — deploy step placeholder"
+      - name: Тесты
+        run: make test
