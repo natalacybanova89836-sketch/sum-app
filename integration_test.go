@@ -1,68 +1,34 @@
-name: Go CI
+package main
 
-on:
-push:
-branches: [ main ]
-pull_request:
-branches: [ main ]
+import (
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	"os"
+	"testing"
+)
 
-jobs:
-# -------------------------------
-# Линтинг кода
-# -------------------------------
-lint:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout code
-uses: actions/checkout@v3
+func setupTestDB(t *testing.T) *sqlx.DB {
+	dsn := os.Getenv("TEST_DATABASE_DSN")
+	if dsn == "" {
+		t.Skip("TEST_DATABASE_DSN not set; skip integration test")
+	}
+	db, err := sqlx.Connect("postgres", dsn)
+	if err != nil {
+		t.Fatalf("failed connect to db: %v", err)
+	}
+	// очистка таблиц, пример:
+	// db.Exec("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
+	return db
+}
 
-- name: Set up Go
-uses: actions/setup-go@v5
-with:
-go-version: '1.22'
+func TestDBExample(t *testing.T) {
+	db := setupTestDB(t)
+	defer db.Close()
 
-- name: Установка зависимостей
-run: go mod download
-
-- name: Линт
-run: make lint
-
-# -------------------------------
-# Юнит и интеграционные тесты
-# -------------------------------
-test:
-runs-on: ubuntu-latest
-needs: lint   # тесты запускаются только после успешного линта
-
-services:
-postgres:
-image: postgres:15
-ports:
-- 5432:5432
-env:
-POSTGRES_USER: postgres
-POSTGRES_PASSWORD: postgres
-POSTGRES_DB: testdb
-options: >-
---health-cmd "pg_isready -U postgres"
---health-interval 10s
---health-timeout 5s
---health-retries 5
-
-env:
-TEST_DATABASE_DSN: postgres://postgres:postgres@localhost:5432/testdb?sslmode=disable
-
-steps:
-- name: Checkout code
-uses: actions/checkout@v3
-
-- name: Set up Go
-uses: actions/setup-go@v5
-with:
-go-version: '1.22'
-
-- name: Установка зависимостей
-run: go mod download
-
-- name: Запуск тестов
-run: make test
+	// пример: проверим, что можем выполнить простой запрос
+	var now string
+	if err := db.Get(&now, "SELECT now()::text"); err != nil {
+		t.Fatalf("db query failed: %v", err)
+	}
+	t.Logf("DB responded: %s", now)
+}
