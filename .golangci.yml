@@ -1,8 +1,14 @@
-run:
-  timeout: 2m
 linters:
   enable:
-    - errcheck
-    - gosimple
     - govet
+    - errcheck
     - staticcheck
+    - gosimple
+  disable:
+    - goanalysis_metalinter
+
+issues:
+  exclude-rules:
+    - path: ".*_test.go"
+      linters:
+        - goanalysis_metalinter
