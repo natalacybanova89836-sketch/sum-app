@@ -18,7 +18,7 @@ jobs:
 
       - name: Установка зависимостей
         run: go mod download
-      - name: Install golangci-lint
+      - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.59.1
