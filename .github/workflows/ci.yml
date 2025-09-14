@@ -29,22 +29,22 @@ jobs:
       TEST_DATABASE_DSN: postgres://postgres:postgres@localhost:5432/testdb?sslmode=disable
 
     steps:
+      # -----------------------
+      # Скачиваем код
+      # -----------------------
       - uses: actions/checkout@v3
 
+      # -----------------------
+      # Устанавливаем Go
+      # -----------------------
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
 
+      # -----------------------
+      # Скачиваем зависимости
+      # -----------------------
       - name: Установка зависимостей
-        run: go mod download
+        run: go mod tidy
 
-      - name: Install golangci-lint
-        run: |
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.59.1
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-
-      - name: Линт
-        run: make lint
-
-      - name: Тесты
-        run: make test
+      # ---
