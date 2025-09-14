@@ -7,9 +7,10 @@ pull_request:
 branches: [ main ]
 
 jobs:
-# -------------------------------
-# Линтинг кода
-# -------------------------------
+- name: Install golangci-lint
+uses: golangci/golangci-lint-action@v4
+with:
+version: v1.59.1
 lint:
 runs-on: ubuntu-latest
 steps:
